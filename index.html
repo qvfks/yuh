@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html>
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -7,76 +7,19 @@
   <style>
     body{font-family:Arial,system-ui,sans-serif;margin:24px}
     pre{background:#111;color:#eee;padding:16px;border-radius:12px;overflow:auto}
-    .muted{color:#666}
-    input{padding:10px;width:280px;margin:6px 0}
-    button{padding:10px 14px;cursor:pointer}
-    .ok{color:#0a0;font-weight:700}
-    .bad{color:#a00;font-weight:700}
-    code{background:#f3f3f3;padding:2px 6px;border-radius:6px}
+    a{color:#06f}
   </style>
 </head>
 <body>
   <h1>Whitelist Host</h1>
-  <p class="muted">
-    Raw file: <a href="./whitelist.txt">whitelist.txt</a>
-  </p>
-
-  <h3>Quick Test</h3>
-  <div>
-    <div><input id="u" placeholder="Roblox username" /></div>
-    <div><input id="k" placeholder="Key" /></div>
-    <button id="btn">Check</button>
-    <div id="out"></div>
-  </div>
-
-  <h3>Raw Data Preview</h3>
+  <p>Raw file: <a href="./whitelist.txt">whitelist.txt</a></p>
   <pre id="raw">Loading...</pre>
 
   <script>
-    const RAW_URL = "./whitelist.txt";
-
-    function parseWhitelist(text){
-      const map = new Map(); // usernameLower -> key
-      const lines = text.split(/\r?\n/);
-      for(const line of lines){
-        const t = line.trim();
-        if(!t || t.startsWith("#")) continue;
-        const parts = t.split(/\s+/);
-        if(parts.length < 2) continue;
-        const username = parts[0];
-        const key = parts.slice(1).join(" ").trim(); // supports keys with spaces if needed
-        map.set(username.toLowerCase(), key);
-      }
-      return map;
-    }
-
-    async function load(){
-      const res = await fetch(RAW_URL, { cache:"no-store" });
-      if(!res.ok) throw new Error("Failed to load whitelist.txt");
-      const text = await res.text();
-      document.getElementById("raw").textContent = text;
-      return parseWhitelist(text);
-    }
-
-    let wl = null;
-
-    load().then(map => wl = map).catch(err => {
-      document.getElementById("raw").textContent = String(err);
-    });
-
-    document.getElementById("btn").onclick = () => {
-      const u = document.getElementById("u").value.trim().toLowerCase();
-      const k = document.getElementById("k").value.trim();
-      const out = document.getElementById("out");
-      if(!wl){ out.innerHTML = `<p class="bad">Whitelist not loaded</p>`; return; }
-      const key = wl.get(u);
-      if(key && key === k) out.innerHTML = `<p class="ok">VALID</p>`;
-      else out.innerHTML = `<p class="bad">INVALID</p>`;
-    };
+    fetch("./whitelist.txt", { cache:"no-store" })
+      .then(r => r.text())
+      .then(t => document.getElementById("raw").textContent = t)
+      .catch(e => document.getElementById("raw").textContent = String(e));
   </script>
-
-  <p class="muted">
-    Expected format per line: <code>username key</code>
-  </p>
 </body>
 </html>
