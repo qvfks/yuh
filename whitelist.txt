@@ -1,0 +1,6 @@
+# username key
+yarified 123
+robloxusername2 key2
+
+# comments and blank lines are allowed
+SomeUser 12345-ABCDE
